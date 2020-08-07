@@ -71,7 +71,23 @@ class Game():
         if event.key == pygame.K_ESCAPE:
             pygame.quit()
 
+    #Update: if press esc leave game, after game over if press any key restarts the game
+    #todo: Implement a function Menu
+    
+    def checkForKeyPress(self):
+        if len(pygame.event.get(pygame.QUIT)) > 0:
+            pygame.quit()
 
+        keyUpEvents = pygame.event.get(pygame.KEYUP)
+
+        if len(keyUpEvents) == 0:
+            return None
+        
+        if keyUpEvents[0].key == pygame.K_ESCAPE:
+            pygame.quit()
+            quit()
+        
+        return keyUpEvents[0].key
     
     def resetGame(self):
         del self.snake
@@ -93,10 +109,37 @@ class Game():
         for wormBody in self.snake.wormCoords[1:]:
             if wormBody['x'] == self.snake.wormCoords[self.snake.HEAD]['x'] and wormBody['y'] == self.snake.wormCoords[self.snake.HEAD]['y']:
                 return self.resetGame()
+   
+    #Update: Function 'displayGameOver'
+    def displayGameOver(self):
+        gameOverFont = pygame.font.Font('freesansbold.ttf', 150)
+        gameSurf = gameOverFont.render('Game', True, Config.WHITE)
+        overSurf = gameOverFont.render('Over', True, Config.WHITE)
+        gameRect = gameSurf.get_rect()
+        overRect = overSurf.get_rect()
+        gameRect.midtop = (Config.WINDOW_WIDTH / 2, 10)
+        overRect.midtop = (Config.WINDOW_HEIGHT / 2, gameRect.height + 10 + 25)
+        self.screen.blint(gameSurf, gameRect)
+        self.screen.blint(overSurf, overRect)
 
+        self.drawPressKeyMsg()
+        pygame.display.update()
+        pygame.time.wait(500)
 
+        self.checkForKeyPress() # Clean out any key presses in the event queue
+
+        while True:
+            if self.checkForKeyPress():
+                pygame.event.get() # Clear event queue
+                return
 
     def run(self):
+        while True:
+            self.gameLoop()
+            self.displayGameOver()
+
+
+    def gameLoop(self): #Changed run to gameloop | Update on log later
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
