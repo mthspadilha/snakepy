@@ -22,7 +22,7 @@ class Snake():
         #check if snakes has eaten an apple
         if self.wormCoords[self.HEAD]['x'] == apple.x and self.wormCoords[self.HEAD]['y'] == apple.y:
              apple.setNewLocation()
-             Config.FPS = Config.FPS + 1
+            # Config.FPS = Config.FPS + 1
         else:
             del self.wormCoords[-1] # remove snake tail segment
     
