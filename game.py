@@ -3,11 +3,13 @@ from snake import Snake
 from apple import Apple
 import pygame 
 
+#todo: Implement a menu screen
+#todo: Implement a scoreboard
+
 class Game():
     def __init__(self):
         pygame.init()
-    
-
+        
         self.screen = pygame.display.set_mode((Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT))
         self.clock = pygame.time.Clock()
         self.BASICFONT = pygame.font.Font('freesansbold.ttf', 18)
@@ -54,6 +56,8 @@ class Game():
         self.drawApple()
         self.drawSnake()
         self.drawScore(len(self.snake.wormCoords) - 3)
+
+
         #in here: draw snake, aplle, grid
         pygame.display.update()
         self.clock.tick(Config.FPS)
@@ -72,8 +76,8 @@ class Game():
             pygame.quit()
 
     #Update: if press esc leave game, after game over if press any key restarts the game
-    #todo: Implement a function Menu
     
+
     def checkForKeyPress(self):
         if len(pygame.event.get(pygame.QUIT)) > 0:
             pygame.quit()
@@ -88,6 +92,13 @@ class Game():
             quit()
         
         return keyUpEvents[0].key
+    
+    #Update: To display a msg after game over
+    def drawKeyPressMsg(self):
+        pressKeySurf = self.BASICFONT.render('Press a key to play.', True, Config.DARKGRAY)
+        pressKeyRect = pressKeySurf.get_rect()
+        pressKeyRect = topleft = (Config.WINDOW_WIDTH - 200, Config.WINDOW_HEIGHT - 30)
+        self.screen.blit(pressKeySurf, pressKeyRect)
     
     def resetGame(self):
         del self.snake
@@ -119,10 +130,11 @@ class Game():
         overRect = overSurf.get_rect()
         gameRect.midtop = (Config.WINDOW_WIDTH / 2, 10)
         overRect.midtop = (Config.WINDOW_HEIGHT / 2, gameRect.height + 10 + 25)
-        self.screen.blint(gameSurf, gameRect)
-        self.screen.blint(overSurf, overRect)
-
-        self.drawPressKeyMsg()
+        self.screen.blit(gameSurf, gameRect)
+        self.screen.blit(overSurf, overRect)
+        
+        #Update: Bug fixed on displayGameOverFunction
+        self.drawKeyPressMsg()
         pygame.display.update()
         pygame.time.wait(500)
 
@@ -132,8 +144,42 @@ class Game():
             if self.checkForKeyPress():
                 pygame.event.get() # Clear event queue
                 return
+    # Update: Creat a start screen
+    def showStartScreen(self):
+        tittleFont = pygame.font.Font('freesansbold.ttf', 100)
+        tittleSurf = tittleFont.render('Snake!', True, Config.WHITE, Config.DARKGRAY)
+        tittleSurf2 = tittleFont.render('Snake!', True, Config.GREEN)
+        degrees1 = 0
+        degrees2 = 1
+
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    return
+            self.screen.fill(Config.BG_COLOR)
+            rotatedSurf1 = pygame.transform.rotate(tittleSurf, degrees1)
+            rotatedRect1 = rotatedSurf1.get_rect()
+            rotatedRect1.center = (Config.WINDOW_WIDTH / 2, Config.WINDOW_HEIGHT / 2)
+
+            self.screen.blit(rotatedSurf1, rotatedRect1)
+
+            rotatedSurf2 = pygame.transform.rotate(tittleSurf2, degrees2)
+            rotatedRect2 = rotatedSurf2.get_rect()
+            rotatedRect2.center = (Config.WINDOW_WIDTH / 2, Config.WINDOW_HEIGHT / 2)
+
+            self.screen.blit(rotatedSurf2, rotatedRect2)
+
+            self.drawKeyPressMsg()
+
+            pygame.display.update()
+            self.clock.tick(Config.MENU_FPS)
+            degrees1 += 1 #rotate by 3 degrees each frame
+            degrees2 += 2 #rotate by 7 degress each frame
+                
 
     def run(self):
+        self.showStartScreen()
+
         while True:
             self.gameLoop()
             self.displayGameOver()

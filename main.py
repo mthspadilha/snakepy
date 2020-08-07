@@ -5,7 +5,7 @@ def main():
     
     game = Game() #INIT
     game.run() #RUN
-    aquit() #QUIT
+    quit() #QUIT
 
 if __name__ == '__main__':
     main()
